@@ -23,6 +23,11 @@ export const useDropBlockOnEditor = (
   return useDrop({
     accept: 'block',
     drop: (dragItem: DragItemBlock, monitor: DropTargetMonitor) => {
+      const didDrop = monitor.didDrop();
+      if (didDrop) {
+        // "deepest" node is where it is dropped
+        return;
+      }
       const direction = getHoverDirection(dragItem, monitor, blockRef, id);
       if (!direction) return;
 
@@ -67,10 +72,20 @@ export const useDropBlockOnEditor = (
           at: dragPath,
           to,
         });
+
+        // emit an event that we need to check the before/after (siblings) of the inserted-to place
+        if (typeof window !== 'undefined') {
+          // @ts-ignore: TS2551
+          window?._events?.emit('node-moved-to', {
+            to: to,
+            direction: direction,
+          });
+        }
       }
     },
     collect: (monitor) => ({
       isOver: monitor.isOver(),
+      isOverCurrent: monitor.isOver({ shallow: true }),
     }),
     hover(item: DragItemBlock, monitor: DropTargetMonitor) {
       const direction = getHoverDirection(item, monitor, blockRef, id);

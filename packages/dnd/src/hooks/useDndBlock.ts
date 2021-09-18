@@ -18,7 +18,7 @@ export const useDndBlock = ({
   const [dropLine, setDropLine] = useState<'' | 'top' | 'bottom'>('');
 
   const [{ isDragging }, dragRef, preview] = useDragBlock(editor, id);
-  const [{ isOver }, drop] = useDropBlockOnEditor(editor, {
+  const [{ isOver, isOverCurrent }, drop] = useDropBlockOnEditor(editor, {
     id,
     blockRef,
     dropLine,
@@ -33,7 +33,7 @@ export const useDndBlock = ({
     preview(drop(blockRef));
   }
 
-  if (!isOver && dropLine) {
+  if (!isOverCurrent && dropLine) {
     setDropLine('');
   }
 
